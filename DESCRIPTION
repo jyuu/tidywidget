@@ -21,5 +21,6 @@ Imports:
     shinyWidgets,
     rstudioapi,
     miniUI (>= 0.1.1),
-    DT
+    DT,
+    htmltools
 Roxygen: list(markdown = TRUE)
