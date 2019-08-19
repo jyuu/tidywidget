@@ -1,4 +1,4 @@
-tidywidgeter <- function(data = NULL) {
+tidywidgeter <- function(id, data = NULL) {
 
   res_data <- get_data(data, name = deparse(substitute(data)))
 
@@ -18,38 +18,54 @@ tidywidgeter <- function(data = NULL) {
 
     # option to tab between
     miniTabstripPanel(
+
       # data selector
       miniTabPanel("Data", icon = icon("table"),
+        # choose a data set
         miniContentPanel(
-          DT::dataTableOutput("userdata")
+          dataInput(id = "choose-data"),
+          padding = 15,
+          scrollable = FALSE
         )
       ),
+
       # pivot longer
       miniTabPanel("Pivot Longer", icon = icon("arrows-v"),
         miniContentPanel(
           DT::dataTableOutput("longer")
         )
       ),
+
       # pivot wider
       miniTabPanel("Pivot Wider", icon = icon("arrows-h"),
         miniContentPanel(
           DT::dataTableOutput("wider")
         )
       ),
+
       # export code
       miniTabPanel("Export", icon = icon("laptop-code"),
         miniContentPanel(
           textOutput("code")
         )
       )
+
     )
   )
 
-  server <- function(input, output, session) {
+  server <- function(input, output, session, data = NULL) {
 
-    output$userdata <- DT::renderDataTable({
-      rv$data
-    })
+    observeEvent(data$data, {
+      dataChart$data <- data$data
+      dataChart$name <- data$name
+    }, ignoreInit = FALSE)
+
+    dataChart <- callModule(
+      module = dataInputServer,
+      id = "choose-data",
+      data = isolate(data$data),
+      name = isolate(data$name)
+    )
 
     # make longer
     rv_longer <- reactive(
@@ -82,7 +98,7 @@ tidywidgeter <- function(data = NULL) {
   }
 
   # use the dialog viewer
-  viewer <- dialogViewer("Tidywidget", width = 700, height = 400)
+  viewer <- dialogViewer("Tidywidget", width = 700, height = 700)
   runGadget(app = ui,
             server = server,
             viewer = viewer)
