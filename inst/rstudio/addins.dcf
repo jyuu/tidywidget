@@ -1,0 +1,4 @@
+Name: pivot helper
+Description: Tidy data with pivot helpers.
+Binding: tidywidgeter
+Interactive: true
